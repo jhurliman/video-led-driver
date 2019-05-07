@@ -37,7 +37,7 @@ static ws2811_t gLEDs = []{
     leds.channel[1].invert = 0;
     leds.channel[1].brightness = 0;
     return leds;
-};
+}();
 
 static std::string pixelToString(const cv::Vec3b pixel) {
     auto r = pixel.val[0];
