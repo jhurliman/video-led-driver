@@ -10,7 +10,6 @@
 
 constexpr size_t COLS = 300;
 constexpr size_t ROWS = 300;
-constexpr size_t LED_COUNT = 300;
 constexpr size_t BORDER_SIZE = 3;
 constexpr double SCALE_FACTOR = 1.05;
 constexpr size_t FPS = 30;
@@ -18,6 +17,7 @@ constexpr std::chrono::milliseconds FRAME_TIME(1000 / FPS);
 constexpr int DMA = 10;
 constexpr int GPIO_PIN = 18;
 constexpr int LED_COUNT = 300;
+constexpr bool CLEAR_ON_EXIT = true;
 
 static const cv::Size RESIZE_SIZE(COLS + BORDER_SIZE * 2, ROWS + BORDER_SIZE * 2);
 static const cv::Rect CROP_RECT(BORDER_SIZE, BORDER_SIZE, COLS, ROWS);
@@ -80,7 +80,7 @@ int main(int, char**) {
     cv::Mat downsampled;
     cv::Mat cropped;
 
-    while (running) {
+    while (gRunning) {
         auto frameEnd = std::chrono::steady_clock::now() + FRAME_TIME;
 
         cap >> frame;
@@ -89,14 +89,14 @@ int main(int, char**) {
 
         for (size_t x = 0; x < COLS; x++) {
             cv::Vec3b pixel = cropped.at<cv::Vec3b>(ROWS - 1, x);
-            gLEDs.channel[0].leds[i] = pixelToLEDColor(pixel);
+            gLEDs.channel[0].leds[x] = pixelToLEDColor(pixel);
         }
 
         ws2811_render(&gLEDs);
         std::this_thread::sleep_until(frameEnd);
     }
 
-    if (clear_on_exit) {
+    if (CLEAR_ON_EXIT) {
         clearLEDs();
         ws2811_render(&gLEDs);
     }
