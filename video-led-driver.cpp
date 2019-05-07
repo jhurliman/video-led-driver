@@ -22,25 +22,21 @@ constexpr bool CLEAR_ON_EXIT = true;
 static const cv::Size RESIZE_SIZE(COLS + BORDER_SIZE * 2, ROWS + BORDER_SIZE * 2);
 static const cv::Rect CROP_RECT(BORDER_SIZE, BORDER_SIZE, COLS, ROWS);
 
-bool gRunning = true;
-ws2811_t gLEDs = {
-    freq : WS2811_TARGET_FREQ,
-    dmanum : DMA,
-    channel : {
-        [0] : {
-            gpionum : GPIO_PIN,
-            count : LED_COUNT,
-            invert : 0,
-            brightness : 255,
-            strip_type : WS2811_STRIP_GRB,
-        },
-        [1] : {
-            gpionum : 0,
-            count : 0,
-            invert : 0,
-            brightness : 0,
-        },
-    },
+static bool gRunning = true;
+static ws2811_t gLEDs = []{
+    ws2811_t leds{};
+    leds.freq = WS2811_TARGET_FREQ;
+    leds.dmanum = DMA;
+    leds.channel[0].gpionum = GPIO_PIN;
+    leds.channel[0].count = LED_COUNT;
+    leds.channel[0].invert = 0;
+    leds.channel[0].brightness = 255;
+    leds.channel[0].strip_type = WS2811_STRIP_GRB;
+    leds.channel[1].gpionum = 0;
+    leds.channel[1].count = 0;
+    leds.channel[1].invert = 0;
+    leds.channel[1].brightness = 0;
+    return leds;
 };
 
 static std::string pixelToString(const cv::Vec3b pixel) {
