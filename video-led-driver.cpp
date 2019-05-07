@@ -24,17 +24,17 @@ static const cv::Rect CROP_RECT(BORDER_SIZE, BORDER_SIZE, COLS, ROWS);
 
 bool gRunning = true;
 ws2811_t gLEDs = {
-    .freq = WS2811_TARGET_FREQ,
-    .dmanum = DMA,
-    .channel = {
-        [0] = {
+    freq : WS2811_TARGET_FREQ,
+    dmanum : DMA,
+    channel : {
+        [0] : {
             gpionum : GPIO_PIN,
             count : LED_COUNT,
             invert : 0,
             brightness : 255,
             strip_type : WS2811_STRIP_GRB,
         },
-        [1] = {
+        [1] : {
             gpionum : 0,
             count : 0,
             invert : 0,
@@ -53,7 +53,7 @@ static std::string pixelToString(const cv::Vec3b pixel) {
 static ws2811_led_t pixelToLEDColor(const cv::Vec3b pixel) {
     uint8_t red = pixel.val[0];
     uint8_t green = pixel.val[1];
-    uint8_t bblue = pixel.val[2];
+    uint8_t blue = pixel.val[2];
     return (uint32_t(green) << 16) | (uint32_t(red) << 8) | uint32_t(blue);
 }
 
