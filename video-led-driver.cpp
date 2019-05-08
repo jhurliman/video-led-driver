@@ -17,7 +17,6 @@ constexpr std::chrono::milliseconds FRAME_TIME(1000 / FPS);
 constexpr int DMA = 10;
 constexpr int GPIO_PIN = 18;
 constexpr int LED_COUNT = 300;
-constexpr bool CLEAR_ON_EXIT = true;
 
 static const cv::Size RESIZE_SIZE(COLS + BORDER_SIZE * 2, ROWS + BORDER_SIZE * 2);
 static const cv::Rect CROP_RECT(BORDER_SIZE, BORDER_SIZE, COLS, ROWS);
@@ -38,6 +37,10 @@ static ws2811_t gLEDs = []{
     leds.channel[1].brightness = 0;
     return leds;
 }();
+
+static void log(const std::string_view msg) {
+    std::cout << msg << std::endl;
+}
 
 static std::string pixelToString(const cv::Vec3b pixel) {
     auto r = pixel.val[0];
@@ -67,11 +70,20 @@ int main(int, char**) {
     std::signal(SIGINT, signalHandler);
     std::signal(SIGTERM, signalHandler);
 
+    log("Initializing LED driver");
+    ws2811_return_t ret;
+    if ((ret = ws2811_init(&gLEDs)) != WS2811_SUCCESS) {
+        fprintf(stderr, "ws2811_init failed: %s\n", ws2811_get_return_t_str(ret));
+        return ret;
+    }
+
+    log("Opening video capture device");
     cv::VideoCapture cap(0);
     if (!cap.isOpened()) {
         return -1;
     }
 
+    log("Starting video capture");
     cv::Mat frame;
     cv::Mat downsampled;
     cv::Mat cropped;
@@ -80,6 +92,7 @@ int main(int, char**) {
         auto frameEnd = std::chrono::steady_clock::now() + FRAME_TIME;
 
         cap >> frame;
+
         cv::resize(frame, downsampled, RESIZE_SIZE, 0, 0, cv::INTER_AREA);
         cropped = downsampled(CROP_RECT);
 
@@ -92,12 +105,8 @@ int main(int, char**) {
         std::this_thread::sleep_until(frameEnd);
     }
 
-    if (CLEAR_ON_EXIT) {
-        clearLEDs();
-        ws2811_render(&gLEDs);
-    }
-
+    clearLEDs();
+    ws2811_render(&gLEDs);
     ws2811_fini(&gLEDs);
-
     return 0;
 }
