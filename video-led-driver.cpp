@@ -6,6 +6,7 @@
 #include <chrono>
 #include <csignal>
 #include <iostream>
+#include <string>
 #include <thread>
 
 constexpr size_t COLS = 300;
