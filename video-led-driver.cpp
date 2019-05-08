@@ -39,7 +39,7 @@ static ws2811_t gLEDs = []{
     return leds;
 }();
 
-static void log(const std::string_view msg) {
+static void log(const std::string& msg) {
     std::cout << msg << std::endl;
 }
 

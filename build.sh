@@ -2,7 +2,7 @@
 
 mkdir -p dist
 g++ \
-  -std=c++17 \
+  -std=c++1z \
   -lopencv_imgproc \
   -lopencv_highgui \
   -lopencv_core \
